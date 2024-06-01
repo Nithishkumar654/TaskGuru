@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "938075904320",
+    "project_id": "taskguru-51d21",
+    "storage_bucket": "taskguru-51d21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938075904320:android:d8b4ec4d975ab9ecbf82a5",
+        "android_client_info": {
+          "package_name": "com.example.todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938075904320-7gg8v54tbljevji9c65lmped6bvo1c5l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.todo",
+            "certificate_hash": "7bf78e0599c6382f793771927c1cdd590390fa7d"
+          }
+        },
+        {
+          "client_id": "938075904320-5rbuftu9vjenj8n0767bqcpo2tnb23k4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTpac0jBqoz6tbdxItJmw09_WTgnBpJPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938075904320-5rbuftu9vjenj8n0767bqcpo2tnb23k4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
