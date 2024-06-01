@@ -18,7 +18,7 @@ class TodoTile extends StatefulWidget {
 }
 
 class _TodoTileState extends State<TodoTile> {
-  bool? completed = false;
+  bool updating = false;
   @override
   Widget build(BuildContext context) {
     return Consumer<AppProvider>(
@@ -38,14 +38,39 @@ class _TodoTileState extends State<TodoTile> {
               children: [
                 SizedBox(
                   width: 40,
-                  child: CheckboxListTile.adaptive(
-                      value: completed,
-                      activeColor: Colors.green,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          completed = value;
-                        });
-                      }),
+                  child: updating
+                      ? Container(
+                          width: 10,
+                          height: 35,
+                          padding: EdgeInsets.all(5),
+                          margin: EdgeInsets.only(right: 5),
+                          child: CircularProgressIndicator())
+                      : Checkbox(
+                          value: widget.todo.completed,
+                          fillColor: WidgetStatePropertyAll(
+                              provider.currentIndex < 4 ? null : Colors.grey),
+                          activeColor: Colors.green,
+                          onChanged: provider.currentIndex < 4
+                              ? (bool? value) async {
+                                  if (value != null) {
+                                    Map<String, dynamic> todoMap = {
+                                      "Id": widget.todo.id,
+                                      "Todo": widget.todo.todo,
+                                      "Date": widget.todo.date,
+                                      "Time": widget.todo.time,
+                                      "Completed": value,
+                                    };
+                                    setState(() {
+                                      updating = true;
+                                    });
+                                    await provider.update(
+                                        widget.todo.id, todoMap);
+                                    setState(() {
+                                      updating = false;
+                                    });
+                                  }
+                                }
+                              : null),
                 ),
                 Expanded(
                   child: Column(
@@ -80,7 +105,7 @@ class _TodoTileState extends State<TodoTile> {
                         widget.todo.date,
                         style: TextStyle(
                           color: Colors.red,
-                          fontSize: 20,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -88,7 +113,7 @@ class _TodoTileState extends State<TodoTile> {
                         widget.todo.time,
                         style: TextStyle(
                           color: Colors.orange,
-                          fontSize: 20,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

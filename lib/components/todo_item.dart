@@ -3,11 +3,11 @@ class TodoItem {
   final String date;
   final String time;
   final String id;
-
-  const TodoItem({
-    required this.todo,
-    required this.date,
-    required this.time,
-    required this.id,
-  });
+  final bool? completed;
+  const TodoItem(
+      {required this.todo,
+      required this.date,
+      required this.time,
+      required this.id,
+      required this.completed});
 }

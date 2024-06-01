@@ -87,7 +87,6 @@ class MyDrawer extends StatelessWidget {
               )),
               onTap: () {
                 provider.changeCurrentIndex(1);
-
                 Navigator.pop(context);
               },
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:random_string/random_string.dart';
+import 'package:todo/provider/app_provider.dart';
 import 'package:todo/service/database.dart';
 
 class AddTodo extends StatefulWidget {
@@ -89,144 +91,156 @@ class _AddTodoState extends State<AddTodo> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Todo",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+      body: Consumer<AppProvider>(builder: (context, provider, _) {
+        return SingleChildScrollView(
+          child: Container(
+            margin: EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Todo",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                _buildTextField(
-                  controller: todoNameController,
-                  hintText: "Enter Todo",
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a todo';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 15),
-                Text(
-                  "Select Deadline Date",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 10),
+                  _buildTextField(
+                    controller: todoNameController,
+                    hintText: "Enter Todo",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a todo';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                SizedBox(height: 10),
-                _buildDateField(
-                  context: context,
-                  controller: dateController,
-                  hintText: "Select Date",
-                  suffixIcon: Icon(Icons.calendar_today_rounded),
-                  onTap: () => _selectDate(context),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a date';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 15),
-                Text(
-                  "Select Deadline Time",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 15),
+                  Text(
+                    "Select Deadline Date",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                _buildDateField(
-                  context: context,
-                  controller: timeController,
-                  hintText: "Select Time",
-                  onTap: () => _selectTime(context),
-                  suffixIcon: Icon(Icons.timer_sharp),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a time';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                Center(
-                  child: TextButton(
-                    style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.green)),
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        String id = randomAlphaNumeric(10);
-                        Map<String, dynamic> todoMap = {
-                          "Id": update ? widget.id : id,
-                          "Todo": todoNameController.text,
-                          "Date": dateController.text,
-                          "Time": timeController.text
-                        };
-                        try {
-                          update
-                              ? DatabaseMethods().updateTodo(widget.id, todoMap)
-                              : DatabaseMethods().addTodo(todoMap, id);
-                          setState(() {
-                            todoNameController.text = "";
-                            dateController.text = "";
-                            timeController.text = "";
-                          });
-                          // Fluttertoast.showToast(
-                          //   msg: "Todo Added Successfully",
-                          //   toastLength: Toast.LENGTH_SHORT,
-                          //   gravity: ToastGravity.CENTER,
-                          //   timeInSecForIosWeb: 1,
-                          //   backgroundColor: Colors.green,
-                          //   textColor: Colors.white,
-                          //   fontSize: 16.0,
-                          // );
+                  SizedBox(height: 10),
+                  _buildDateField(
+                    context: context,
+                    controller: dateController,
+                    hintText: "Select Date",
+                    suffixIcon: Icon(Icons.calendar_today_rounded),
+                    onTap: () => _selectDate(context),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a date';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "Select Deadline Time",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  _buildDateField(
+                    context: context,
+                    controller: timeController,
+                    hintText: "Select Time",
+                    onTap: () => _selectTime(context),
+                    suffixIcon: Icon(Icons.timer_sharp),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a time';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Center(
+                    child: TextButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStatePropertyAll(Colors.green)),
+                      onPressed: () async {
+                        todoNameController.text =
+                            todoNameController.text.trim();
+                        if (_formKey.currentState!.validate()) {
+                          String id = randomAlphaNumeric(10);
+                          Map<String, dynamic> todoMap = {
+                            "Id": update ? widget.id : id,
+                            "Todo": todoNameController.text,
+                            "Date": dateController.text,
+                            "Time": timeController.text,
+                            "Completed": false,
+                          };
+                          try {
+                            update
+                                ? await provider.update(widget.id, todoMap)
+                                : await DatabaseMethods().addTodo(todoMap, id);
+                            setState(() {
+                              todoNameController.text = "";
+                              dateController.text = "";
+                              timeController.text = "";
+                            });
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            snackBarAnimationStyle: AnimationStyle(
-                              duration: Duration(seconds: 1),
-                              curve: Curves.decelerate,
-                            ),
-                            SnackBar(
-                              duration: Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                              showCloseIcon: true,
-                              closeIconColor: Colors.black,
-                              backgroundColor: Colors.lightGreen,
-                              content: Text(update
-                                  ? 'Todo Updated Successfully'
-                                  : 'Todo Added Successfully'),
-                            ),
-                          );
-                          update ? Navigator.pop(context) : widget.gotoHome();
-                          setState(() {
-                            update = false;
-                          });
-                          // Navigator.of(context).pop(); // Close the dialog
-                        } catch (e) {
-                          // Fluttertoast.showToast(
-                          //   msg: "Error: $e",
-                          //   toastLength: Toast.LENGTH_LONG,
-                          //   gravity: ToastGravity.CENTER,
-                          //   timeInSecForIosWeb: 1,
-                          //   backgroundColor: Colors.red,
-                          //   textColor: Colors.white,
-                          //   fontSize: 16.0,
-                          // );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              snackBarAnimationStyle: AnimationStyle(
+                                duration: Duration(seconds: 1),
+                                curve: Curves.decelerate,
+                              ),
+                              SnackBar(
+                                duration: Duration(seconds: 1),
+                                behavior: SnackBarBehavior.floating,
+                                showCloseIcon: true,
+                                closeIconColor: Colors.black,
+                                backgroundColor: Colors.blue,
+                                content: Text(update
+                                    ? 'Todo Updated Successfully'
+                                    : 'Todo Added Successfully'),
+                              ),
+                            );
+                            update ? Navigator.pop(context) : widget.gotoHome();
+                            await Future.delayed(Duration(seconds: 1));
+                            setState(() {
+                              update = false;
+                            });
+                          } catch (e) {
+                            // Fluttertoast.showToast(
+                            //   msg: "Error: $e",
+                            //   toastLength: Toast.LENGTH_LONG,
+                            //   gravity: ToastGravity.CENTER,
+                            //   timeInSecForIosWeb: 1,
+                            //   backgroundColor: Colors.red,
+                            //   textColor: Colors.white,
+                            //   fontSize: 16.0,
+                            // );
 
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              snackBarAnimationStyle: AnimationStyle(
+                                duration: Duration(seconds: 1),
+                                curve: Curves.decelerate,
+                              ),
+                              SnackBar(
+                                duration: Duration(seconds: 1),
+                                behavior: SnackBarBehavior.floating,
+                                showCloseIcon: true,
+                                closeIconColor: Colors.black,
+                                backgroundColor: Colors.red,
+                                content: Text('Error: $e'),
+                              ),
+                            );
+                          }
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             snackBarAnimationStyle: AnimationStyle(
                               duration: Duration(seconds: 1),
@@ -238,38 +252,24 @@ class _AddTodoState extends State<AddTodo> {
                               showCloseIcon: true,
                               closeIconColor: Colors.black,
                               backgroundColor: Colors.red,
-                              content: Text('Error: $e'),
+                              content:
+                                  Text('Error: Please fill all the fields.'),
                             ),
                           );
                         }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          snackBarAnimationStyle: AnimationStyle(
-                            duration: Duration(seconds: 1),
-                            curve: Curves.decelerate,
-                          ),
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            behavior: SnackBarBehavior.floating,
-                            showCloseIcon: true,
-                            closeIconColor: Colors.black,
-                            backgroundColor: Colors.red,
-                            content: Text('Error: Please fill all the fields.'),
-                          ),
-                        );
-                      }
-                    },
-                    child: Text(
-                      update ? "Save" : "Add Todo",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      },
+                      child: Text(
+                        update ? "Save" : "Add Todo",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
