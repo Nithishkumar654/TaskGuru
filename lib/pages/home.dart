@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/components/_drawer.dart';
 import 'package:todo/components/todo_item.dart';
+import 'package:todo/components/todo_tile.dart';
 import 'package:todo/pages/add_update_todo.dart';
 import 'package:todo/provider/app_provider.dart';
 import 'package:todo/service/auth_service.dart';
@@ -24,75 +25,53 @@ class _HomeState extends State<Home> {
   final _auth = AuthService();
   Stream? todoStream;
 
-  final AppProvider provider = AppProvider();
   @override
   void initState() {
     super.initState();
-    getOnLoad();
-    provider.getTodosFromDB(context);
-    print('called');
   }
 
-  void getOnLoad() {
-    todoStream = DatabaseMethods().getTodos();
-    setState(() {});
+  Widget allTodos() {
+    return Consumer<AppProvider>(
+      builder: (context, provider, child) {
+        provider.getTodosFromDB();
+        return ListView.builder(
+            itemCount: provider.getTodos().length,
+            itemBuilder: (context, index) {
+              TodoItem todo = provider.getTodo(index);
+              TodoTile tile = TodoTile(
+                  todo: todo,
+                  onDelete: () async {
+                    await DatabaseMethods().deleteTodo(todo.id);
+                  },
+                  onEdit: () =>
+                      editTodo(todo.id, todo.todo, todo.date, todo.time));
+              return tile;
+            });
+      },
+    );
   }
 
-  // Widget allTodos() {
-  //   return StreamBuilder(
-  //     stream: todoStream,
-  //     builder: (context, AsyncSnapshot snapshot) {
-  //       if (!snapshot.hasData) {
-  //         return Center(child: CircularProgressIndicator());
-  //       }
-  //       if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return const CircularProgressIndicator.adaptive();
-  //       }
-  //       return ListView.builder(
-  //         itemCount: snapshot.data.docs.length,
-  //         itemBuilder: (context, index) {
-  //           DocumentSnapshot ds = snapshot.data.docs[index];
-  //           TodoItem todo = TodoItem(
-  //             todo: ds["Todo"],
-  //             date: ds["Date"],
-  //             time: ds["Time"],
-  //             id: ds["Id"],
-  //             onEdit: () => editTodo(
-  //               ds["Id"],
-  //               ds["Todo"],
-  //               ds["Date"],
-  //               ds["Time"],
-  //             ),
-  //             onDelete: () async {
-  //               await DatabaseMethods().deleteTodo(ds["Id"]);
-  //             },
-  //           );
-  //           provider.add(todo);
-  //           return todo;
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
+  void editTodo(String id, String todo, String date, String time) {
+    todoNameController.text = todo;
+    dateController.text = date;
+    timeController.text = time;
 
-  // Widget allTodos() {
-  //   return Consumer<AppProvider>(
-  //     builder: (context, provider, child) {
-  //       print('${provider.allTodos.length} -- todos');
-  //       return ListView.builder(
-  //           itemCount: provider.allTodos.length,
-  //           itemBuilder: (context, index) {
-  //             TodoItem todo = provider.allTodos[index];
-  //             return todo;
-  //           });
-  //     },
-  //   );
-  // }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          height: 3 * MediaQuery.of(context).size.height / 5,
+          width: MediaQuery.of(context).size.width,
+          child: AddTodo(
+              gotoHome: () {}, id: id, todo: todo, date: date, time: time),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AppProvider>(builder: (context, provider, child) {
-      print('${provider.getTodos().length} --- here');
       return Scaffold(
         // floatingActionButton: FloatingActionButton(
         //   onPressed: () {
@@ -170,13 +149,7 @@ class _HomeState extends State<Home> {
           child: provider.currentIndex == 0
               ? Column(
                   children: [
-                    Expanded(
-                        child: ListView.builder(
-                            itemCount: provider.getTodos().length,
-                            itemBuilder: (context, index) {
-                              TodoItem todo = provider.getTodos()[index];
-                              return todo;
-                            })),
+                    Expanded(child: allTodos()),
                   ],
                 )
               : AddTodo(
@@ -184,9 +157,7 @@ class _HomeState extends State<Home> {
                   id: "",
                   time: "",
                   todo: "",
-                  gotoHome: () => setState(() {
-                        provider.currentIndex = 0;
-                      })),
+                  gotoHome: () => provider.changeCurrentIndex(0)),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: provider.currentIndex < 2 ? provider.currentIndex : 1,
@@ -212,24 +183,5 @@ class _HomeState extends State<Home> {
         ),
       );
     });
-  }
-
-  Future<void> editTodo(
-      String id, String todo, String date, String time) async {
-    todoNameController.text = todo;
-    dateController.text = date;
-    timeController.text = time;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: SizedBox(
-          height: 3 * MediaQuery.of(context).size.height / 5,
-          width: MediaQuery.of(context).size.width,
-          child: AddTodo(
-              gotoHome: () {}, id: id, todo: todo, date: date, time: time),
-        ),
-      ),
-    );
   }
 }
