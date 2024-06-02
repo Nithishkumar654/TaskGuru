@@ -21,10 +21,21 @@ class _VerifyEmailState extends State<VerifyEmail> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    verifyEmail();
+  }
+
+  void verifyEmail() async {
     verified = FirebaseAuth.instance.currentUser!.emailVerified;
+
     if (!verified) {
-      sendEmail();
-      timer = Timer.periodic(Duration(seconds: 3), (_) => checkEmailVerfied());
+      await sendEmail();
+      timer = Timer.periodic(Duration(seconds: 10), (_) async {
+        await checkEmailVerfied();
+      });
+    } else {
+      if (FirebaseAuth.instance.currentUser!.displayName == null) {
+        await FirebaseAuth.instance.currentUser!.updateDisplayName('user');
+      }
     }
   }
 
@@ -36,9 +47,11 @@ class _VerifyEmailState extends State<VerifyEmail> {
         resend = false;
       });
       await Future.delayed(Duration(seconds: 5));
-      setState(() {
-        resend = true;
-      });
+      if (mounted) {
+        setState(() {
+          resend = true;
+        });
+      }
     } catch (e) {
       log(e.toString());
     }
@@ -50,7 +63,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
       verified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
     if (verified) {
-      log("${FirebaseAuth.instance.currentUser!.email} ${FirebaseAuth.instance.currentUser!.displayName}");
+      if (FirebaseAuth.instance.currentUser!.displayName == null) {
+        await FirebaseAuth.instance.currentUser!.updateDisplayName('user');
+      }
       timer?.cancel();
     }
   }
@@ -90,7 +105,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
                         style: TextStyle(color: Colors.white),
                       )),
                   ElevatedButton(
-                      onPressed: () => FirebaseAuth.instance.signOut(),
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                      },
                       style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                       child: Text(

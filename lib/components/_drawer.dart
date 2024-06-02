@@ -1,9 +1,33 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/pages/profile.dart';
 import 'package:todo/provider/app_provider.dart';
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
+
+  @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  final _auth = FirebaseAuth.instance.currentUser!;
+
+  void showProfile() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        content: SizedBox(
+          height: 3 * MediaQuery.of(context).size.height / 5,
+          width: MediaQuery.of(context).size.width,
+          child: Profile(),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +45,85 @@ class MyDrawer extends StatelessWidget {
                 ]),
                 child: Stack(
                   children: [
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "TASK ",
-                            style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          Text(
-                            "GURU ",
-                            style: TextStyle(
-                                color: Colors.orange,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                fontStyle: FontStyle.italic),
-                          ),
-                        ],
+                    SingleChildScrollView(
+                      child: Center(
+                        child: Column(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "TASK ",
+                                  style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                                Text(
+                                  "GURU ",
+                                  style: TextStyle(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            if (_auth.photoURL != null)
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipOval(
+                                  child: InstaImageViewer(
+                                    child: PhotoView(
+                                      imageProvider: NetworkImage(
+                                        _auth.photoURL!,
+                                      ),
+                                      backgroundDecoration: BoxDecoration(
+                                          color: Colors.transparent),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else
+                              Icon(
+                                Icons.person,
+                                size: 50,
+                              ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      'Welcome ${_auth.displayName}',
+                                      softWrap: true,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    showProfile();
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(

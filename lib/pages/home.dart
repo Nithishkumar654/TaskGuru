@@ -20,7 +20,7 @@ class _HomeState extends State<Home> {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
 
-  bool isLoading = false;
+  bool isLoading = false, deleting = false;
   final _auth = AuthService();
 
   @override
@@ -44,9 +44,6 @@ class _HomeState extends State<Home> {
               TodoItem todo = todos[index];
               TodoTile tile = TodoTile(
                   todo: todo,
-                  onDelete: () async {
-                    await DatabaseMethods().deleteTodo(todo.id);
-                  },
                   onEdit: () =>
                       editTodo(todo.id, todo.todo, todo.date, todo.time));
               return tile;
@@ -119,7 +116,7 @@ class _HomeState extends State<Home> {
                 setState(() {
                   isLoading = true;
                 });
-                _auth.signout();
+                await _auth.signout();
                 setState(() {
                   isLoading = false;
                 });

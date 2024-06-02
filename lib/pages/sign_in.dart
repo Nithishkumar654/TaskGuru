@@ -147,10 +147,6 @@ class _SignInState extends State<SignIn> {
                       ),
                     );
                   }
-                  // if (done == "Success") {
-                  //   Navigator.push(context,
-                  //       MaterialPageRoute(builder: (context) => Home()));
-                  // }
                 },
                 style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll(Colors.green)),
@@ -188,12 +184,11 @@ class _SignInState extends State<SignIn> {
                     setState(() {
                       isLoading = true;
                     });
+                    print('clicked');
                     await _auth.loginWithGoogle();
                     setState(() {
                       isLoading = false;
                     });
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Home()));
                   },
                   style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.blue)),

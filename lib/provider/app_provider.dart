@@ -93,6 +93,16 @@ class AppProvider extends ChangeNotifier {
     await getTodosFromDB();
   }
 
+  Future<void> add(String id, Map<String, dynamic> todoMap) async {
+    await DatabaseMethods().addTodo(todoMap, id);
+    await getTodosFromDB();
+  }
+
+  Future<void> delete(String id) async {
+    await DatabaseMethods().deleteTodo(id);
+    await getTodosFromDB();
+  }
+
   // List<TodoItem> getTodos() {
   //   return allTodos;
   // }

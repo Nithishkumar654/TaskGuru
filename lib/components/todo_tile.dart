@@ -6,19 +6,14 @@ import 'package:todo/provider/app_provider.dart';
 class TodoTile extends StatefulWidget {
   final TodoItem todo;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  const TodoTile(
-      {super.key,
-      required this.todo,
-      required this.onDelete,
-      required this.onEdit});
+  const TodoTile({super.key, required this.todo, required this.onEdit});
 
   @override
   State<TodoTile> createState() => _TodoTileState();
 }
 
 class _TodoTileState extends State<TodoTile> {
-  bool updating = false;
+  bool updating = false, deleting = false;
   @override
   Widget build(BuildContext context) {
     return Consumer<AppProvider>(
@@ -96,8 +91,30 @@ class _TodoTileState extends State<TodoTile> {
                             width: 10,
                           ),
                           GestureDetector(
-                            onTap: widget.onDelete,
-                            child: Icon(Icons.delete, color: Colors.red),
+                            onTap: deleting
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      deleting = true;
+                                    });
+                                    await provider.delete(widget.todo.id);
+                                    setState(() {
+                                      deleting = false;
+                                    });
+                                  },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              child: deleting
+                                  ? SizedBox(
+                                      width: 10,
+                                      height: 10,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.red,
+                                      ),
+                                    )
+                                  : Icon(Icons.delete, color: Colors.red),
+                            ),
                           ),
                         ],
                       ),

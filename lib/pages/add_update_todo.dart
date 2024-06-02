@@ -26,7 +26,7 @@ class _AddTodoState extends State<AddTodo> {
   final TextEditingController timeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool update = false;
-
+  bool saving = false;
   @override
   void initState() {
     super.initState();
@@ -169,98 +169,125 @@ class _AddTodoState extends State<AddTodo> {
                   Center(
                     child: TextButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Colors.green)),
-                      onPressed: () async {
-                        todoNameController.text =
-                            todoNameController.text.trim();
-                        if (_formKey.currentState!.validate()) {
-                          String id = randomAlphaNumeric(10);
-                          Map<String, dynamic> todoMap = {
-                            "Id": update ? widget.id : id,
-                            "Todo": todoNameController.text,
-                            "Date": dateController.text,
-                            "Time": timeController.text,
-                            "Completed": false,
-                          };
-                          try {
-                            update
-                                ? await provider.update(widget.id, todoMap)
-                                : await DatabaseMethods().addTodo(todoMap, id);
-                            setState(() {
-                              todoNameController.text = "";
-                              dateController.text = "";
-                              timeController.text = "";
-                            });
+                          backgroundColor: WidgetStatePropertyAll(
+                              saving ? Colors.grey : Colors.green)),
+                      onPressed: saving
+                          ? null
+                          : () async {
+                              todoNameController.text =
+                                  todoNameController.text.trim();
+                              if (_formKey.currentState!.validate()) {
+                                String id = randomAlphaNumeric(10);
+                                Map<String, dynamic> todoMap = {
+                                  "Id": update ? widget.id : id,
+                                  "Todo": todoNameController.text,
+                                  "Date": dateController.text,
+                                  "Time": timeController.text,
+                                  "Completed": false,
+                                };
+                                try {
+                                  setState(() {
+                                    saving = true;
+                                  });
+                                  update
+                                      ? await provider.update(
+                                          widget.id, todoMap)
+                                      : await provider.add(id, todoMap);
+                                  setState(() {
+                                    todoNameController.text = "";
+                                    dateController.text = "";
+                                    timeController.text = "";
+                                  });
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              snackBarAnimationStyle: AnimationStyle(
-                                duration: Duration(seconds: 1),
-                                curve: Curves.decelerate,
-                              ),
-                              SnackBar(
-                                duration: Duration(seconds: 1),
-                                behavior: SnackBarBehavior.floating,
-                                showCloseIcon: true,
-                                closeIconColor: Colors.black,
-                                backgroundColor: Colors.blue,
-                                content: Text(update
-                                    ? 'Todo Updated Successfully'
-                                    : 'Todo Added Successfully'),
-                              ),
-                            );
-                            update ? Navigator.pop(context) : widget.gotoHome();
-                            await Future.delayed(Duration(seconds: 1));
-                            setState(() {
-                              update = false;
-                            });
-                          } catch (e) {
-                            // Fluttertoast.showToast(
-                            //   msg: "Error: $e",
-                            //   toastLength: Toast.LENGTH_LONG,
-                            //   gravity: ToastGravity.CENTER,
-                            //   timeInSecForIosWeb: 1,
-                            //   backgroundColor: Colors.red,
-                            //   textColor: Colors.white,
-                            //   fontSize: 16.0,
-                            // );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBarAnimationStyle: AnimationStyle(
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.decelerate,
+                                    ),
+                                    SnackBar(
+                                      duration: Duration(seconds: 1),
+                                      behavior: SnackBarBehavior.floating,
+                                      showCloseIcon: true,
+                                      closeIconColor: Colors.black,
+                                      backgroundColor: Colors.blue,
+                                      content: Text(update
+                                          ? 'Todo Updated Successfully'
+                                          : 'Todo Added Successfully'),
+                                    ),
+                                  );
+                                  update
+                                      ? Navigator.pop(context)
+                                      : widget.gotoHome();
+                                  await Future.delayed(Duration(seconds: 1));
+                                  setState(() {
+                                    update = false;
+                                    saving = false;
+                                  });
+                                } catch (e) {
+                                  // Fluttertoast.showToast(
+                                  //   msg: "Error: $e",
+                                  //   toastLength: Toast.LENGTH_LONG,
+                                  //   gravity: ToastGravity.CENTER,
+                                  //   timeInSecForIosWeb: 1,
+                                  //   backgroundColor: Colors.red,
+                                  //   textColor: Colors.white,
+                                  //   fontSize: 16.0,
+                                  // );
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              snackBarAnimationStyle: AnimationStyle(
-                                duration: Duration(seconds: 1),
-                                curve: Curves.decelerate,
-                              ),
-                              SnackBar(
-                                duration: Duration(seconds: 1),
-                                behavior: SnackBarBehavior.floating,
-                                showCloseIcon: true,
-                                closeIconColor: Colors.black,
-                                backgroundColor: Colors.red,
-                                content: Text('Error: $e'),
-                              ),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            snackBarAnimationStyle: AnimationStyle(
-                              duration: Duration(seconds: 1),
-                              curve: Curves.decelerate,
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    snackBarAnimationStyle: AnimationStyle(
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.decelerate,
+                                    ),
+                                    SnackBar(
+                                      duration: Duration(seconds: 1),
+                                      behavior: SnackBarBehavior.floating,
+                                      showCloseIcon: true,
+                                      closeIconColor: Colors.black,
+                                      backgroundColor: Colors.red,
+                                      content: Text('Error: $e'),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  snackBarAnimationStyle: AnimationStyle(
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.decelerate,
+                                  ),
+                                  SnackBar(
+                                    duration: Duration(seconds: 1),
+                                    behavior: SnackBarBehavior.floating,
+                                    showCloseIcon: true,
+                                    closeIconColor: Colors.black,
+                                    backgroundColor: Colors.red,
+                                    content: Text(
+                                        'Error: Please fill all the fields.'),
+                                  ),
+                                );
+                              }
+                            },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            update ? "Save" : "Add Todo",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          if (saving) ...[
+                            SizedBox(
+                              width: 5,
                             ),
-                            SnackBar(
-                              duration: Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                              showCloseIcon: true,
-                              closeIconColor: Colors.black,
-                              backgroundColor: Colors.red,
-                              content:
-                                  Text('Error: Please fill all the fields.'),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text(
-                        update ? "Save" : "Add Todo",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                            Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(shape: BoxShape.circle),
+                              child: ClipOval(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          ]
+                        ],
                       ),
                     ),
                   ),
