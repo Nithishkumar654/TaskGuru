@@ -183,7 +183,6 @@ class _SignInState extends State<SignIn> {
                     setState(() {
                       isLoading = true;
                     });
-                    print('clicked');
                     await _auth.loginWithGoogle();
                     setState(() {
                       isLoading = false;

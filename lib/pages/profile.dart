@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -67,7 +68,7 @@ class _ProfileState extends State<Profile> {
       String url = await image.getDownloadURL();
       return url;
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
     }
     return null;
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -16,7 +18,7 @@ class DatabaseMethods {
             .set(todoMap);
       }
     } catch (e) {
-      print('Error while adding: $e');
+      log('Error while adding: $e');
       throw e;
     }
   }
@@ -45,7 +47,7 @@ class DatabaseMethods {
             .update(updateTodo);
       }
     } catch (e) {
-      print('Error while updating: $e');
+      log('Error while updating: $e');
       throw e;
     }
   }
@@ -63,7 +65,7 @@ class DatabaseMethods {
             .delete();
       }
     } catch (e) {
-      print('Error while deleting: $e');
+      log('Error while deleting: $e');
       throw e;
     }
   }
