@@ -50,7 +50,6 @@ class _ProfileState extends State<Profile> {
   Future<String?> selectPicture() async {
     ImagePicker imagePicker = ImagePicker();
     XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
-    print(file!.path);
 
     if (file == null) return null;
 

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:random_string/random_string.dart';
 import 'package:todo/provider/app_provider.dart';
-import 'package:todo/service/database.dart';
 
 class AddTodo extends StatefulWidget {
   final VoidCallback gotoHome;

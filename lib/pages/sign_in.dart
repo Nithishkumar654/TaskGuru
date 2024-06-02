@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:todo/pages/home.dart';
 import 'package:todo/pages/sign_up.dart';
 import 'package:todo/service/auth_service.dart';
 

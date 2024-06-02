@@ -6,7 +6,6 @@ import 'package:todo/components/todo_tile.dart';
 import 'package:todo/pages/add_update_todo.dart';
 import 'package:todo/provider/app_provider.dart';
 import 'package:todo/service/auth_service.dart';
-import 'package:todo/service/database.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
